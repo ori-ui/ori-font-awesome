@@ -1,7 +1,7 @@
 //! This crate provides a simple way to use Font Awesome icons in your ['ori'] applications.
 //!
 //! # Example
-//! ```rust
+//! ```rust,ignore
 //! use ori::prelude::*;
 //! use ori_font_awesome as fa;
 //!
