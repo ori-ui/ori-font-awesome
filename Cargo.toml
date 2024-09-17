@@ -1,0 +1,12 @@
+[package]
+name = "ori-font-awesome"
+version = "0.1.0-alpha.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[build-dependencies]
+json = "0.12"
+
+[dependencies.ori]
+git = "https://github.com/ChangeCaps/ori.git"
+default-features = false
