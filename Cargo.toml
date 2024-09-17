@@ -8,5 +8,5 @@ license = "MIT OR Apache-2.0"
 json = "0.12"
 
 [dependencies.ori]
-git = "https://github.com/ChangeCaps/ori.git"
+git = "https://github.com/ori-ui/ori.git"
 default-features = false
