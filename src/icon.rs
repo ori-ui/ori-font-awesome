@@ -1,4 +1,4 @@
-use ori::{core::text::TextAttributes, prelude::*};
+use ori::{core::text::FontAttributes, prelude::*};
 
 use crate::{IconCode, IconFont};
 
@@ -11,14 +11,16 @@ pub fn icon(icon: impl Into<IconCode>) -> Icon {
 ///
 /// By default, the icon is rendered using the `icon.font` font family.
 /// This uses the [Font Awesome 6 Regular Free](https://fontawesome.com/) font by default.
-#[derive(Styled, Build)]
+#[derive(Styled, Build, Rebuild)]
 pub struct Icon {
     /// The codepoint of the icon to display.
+    #[rebuild(layout)]
     pub icon: IconCode,
 
     /// Whether the icon is solid or regular.
     ///
     /// This only affects the rendering of the icon if the icon is available in both styles.
+    #[rebuild(layout)]
     pub solid: bool,
 
     /// The size of the icon.
@@ -57,37 +59,12 @@ impl Icon {
 
         self.icon.fonts()[0]
     }
-
-    fn set_attributes(&self, cx: &mut BaseCx, buffer: &mut TextBuffer, style: &IconStyle) {
-        struct FontsLoaded;
-
-        // ensure that all the fonts are loaded
-        if !cx.contains_context::<FontsLoaded>() {
-            cx.fonts().load_font(include_font!("font")).unwrap();
-
-            cx.insert_context(FontsLoaded);
-        }
-
-        let font = self.font();
-
-        buffer.set_metrics(cx.fonts(), style.size, 1.0);
-        buffer.set_text(
-            cx.fonts(),
-            self.icon.as_str(),
-            TextAttributes {
-                family: font.family(),
-                stretch: FontStretch::Normal,
-                weight: font.weight(),
-                style: FontStyle::Normal,
-            },
-        );
-    }
 }
 
 #[doc(hidden)]
 pub struct IconState {
     style: IconStyle,
-    buffer: TextBuffer,
+    paragraph: Paragraph,
 }
 
 impl<T> View<T> for Icon {
@@ -95,27 +72,43 @@ impl<T> View<T> for Icon {
 
     fn build(&mut self, cx: &mut BuildCx, _data: &mut T) -> Self::State {
         let style = IconStyle::styled(self, cx.styles());
-        let mut buffer = TextBuffer::new(cx.fonts(), style.size, 1.0);
+        let mut paragraph = Paragraph::new(1.0, TextAlign::Center, TextWrap::None);
 
-        self.set_attributes(cx, &mut buffer, &style);
+        paragraph.set_text(
+            self.icon.as_str(),
+            FontAttributes {
+                size: style.size,
+                family: self.font().family(),
+                stretch: FontStretch::Normal,
+                weight: FontWeight::NORMAL,
+                style: FontStyle::Normal,
+                color: style.color,
+            },
+        );
 
-        IconState { style, buffer }
+        struct FontsLoaded;
+        if !cx.contains_context::<FontsLoaded>() {
+            cx.fonts_mut().load(include_font!("font"));
+            cx.insert_context(FontsLoaded);
+        }
+
+        IconState { style, paragraph }
     }
 
-    fn rebuild(&mut self, state: &mut Self::State, cx: &mut RebuildCx, _data: &mut T, old: &Self) {
-        let size = state.style.size;
-        let color = state.style.color;
-
+    fn rebuild(&mut self, state: &mut Self::State, cx: &mut RebuildCx, _data: &mut T, _old: &Self) {
         state.style.rebuild(self, cx);
 
-        if self.icon != old.icon
-            || self.solid != old.solid
-            || size != state.style.size
-            || color != state.style.color
-        {
-            self.set_attributes(cx, &mut state.buffer, &state.style);
-            cx.layout();
-        }
+        state.paragraph.set_text(
+            self.icon.as_str(),
+            FontAttributes {
+                size: state.style.size,
+                family: self.font().family(),
+                stretch: FontStretch::Normal,
+                weight: FontWeight::NORMAL,
+                style: FontStyle::Normal,
+                color: state.style.color,
+            },
+        );
     }
 
     fn event(
@@ -131,17 +124,14 @@ impl<T> View<T> for Icon {
     fn layout(
         &mut self,
         state: &mut Self::State,
-        cx: &mut LayoutCx,
+        _cx: &mut LayoutCx,
         _data: &mut T,
         space: Space,
     ) -> Size {
-        state.buffer.set_bounds(cx.fonts(), space.max);
-
-        Size::all(state.style.size)
+        space.fit(Size::all(state.style.size))
     }
 
     fn draw(&mut self, state: &mut Self::State, cx: &mut DrawCx, _data: &mut T) {
-        let offset = cx.rect().center() - state.buffer.rect().center();
-        cx.text(&state.buffer, state.style.color, offset);
+        cx.text(&state.paragraph, cx.rect());
     }
 }
