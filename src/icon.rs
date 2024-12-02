@@ -72,15 +72,15 @@ impl<T> View<T> for Icon {
 
     fn build(&mut self, cx: &mut BuildCx, _data: &mut T) -> Self::State {
         let style = IconStyle::styled(self, cx.styles());
-        let mut paragraph = Paragraph::new(1.0, TextAlign::Center, TextWrap::None);
+        let mut paragraph = Paragraph::new(1.0, TextAlign::Start, TextWrap::None);
 
         paragraph.set_text(
-            self.icon.as_str(),
+            self.icon.code_point(),
             FontAttributes {
                 size: style.size,
                 family: self.font().family(),
                 stretch: FontStretch::Normal,
-                weight: FontWeight::NORMAL,
+                weight: self.font().weight(),
                 style: FontStyle::Normal,
                 color: style.color,
             },
@@ -88,7 +88,7 @@ impl<T> View<T> for Icon {
 
         struct FontsLoaded;
         if !cx.contains_context::<FontsLoaded>() {
-            cx.fonts_mut().load(include_font!("font"));
+            cx.fonts().load(include_font!("font"));
             cx.insert_context(FontsLoaded);
         }
 
@@ -132,6 +132,12 @@ impl<T> View<T> for Icon {
     }
 
     fn draw(&mut self, state: &mut Self::State, cx: &mut DrawCx, _data: &mut T) {
-        cx.text(&state.paragraph, cx.rect());
+        let width = cx.size().width;
+        let size = cx.fonts().measure(&state.paragraph, width);
+
+        let offset = cx.size() / 2.0 - size / 2.0;
+        let rect = Rect::min_size(offset.to_point(), size);
+
+        cx.text(&state.paragraph, rect);
     }
 }

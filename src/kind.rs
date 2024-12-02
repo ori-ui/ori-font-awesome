@@ -13,8 +13,10 @@ impl From<&str> for IconCode {
 pub enum IconFont {
     /// The regular font.
     Regular,
+
     /// The solid font.
     Solid,
+
     /// The brand font.
     Brand,
 }
