@@ -132,11 +132,10 @@ impl<T> View<T> for Icon {
     }
 
     fn draw(&mut self, state: &mut Self::State, cx: &mut DrawCx, _data: &mut T) {
-        let width = cx.size().width;
-        let size = cx.fonts().measure(&state.paragraph, width);
+        let size = cx.fonts().measure(&state.paragraph, f32::INFINITY);
 
         let offset = cx.size() / 2.0 - size / 2.0;
-        let rect = Rect::min_size(offset.to_point(), size);
+        let rect = Rect::min_size(offset.to_point(), Size::INFINITY);
 
         cx.text(&state.paragraph, rect);
     }
