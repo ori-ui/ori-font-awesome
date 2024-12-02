@@ -137,6 +137,6 @@ impl<T> View<T> for Icon {
         let offset = cx.size() / 2.0 - size / 2.0;
         let rect = Rect::min_size(offset.to_point(), Size::INFINITY);
 
-        cx.text(&state.paragraph, rect);
+        cx.paragraph(&state.paragraph, rect);
     }
 }
