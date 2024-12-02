@@ -10,3 +10,6 @@ json = "0.12"
 [dependencies.ori]
 git = "https://github.com/ori-ui/ori.git"
 default-features = false
+
+[dev-dependencies.ori]
+git = "https://github.com/ori-ui/ori.git"
