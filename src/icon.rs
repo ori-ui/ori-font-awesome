@@ -82,6 +82,7 @@ impl<T> View<T> for Icon {
                 stretch: FontStretch::Normal,
                 weight: self.font().weight(),
                 style: FontStyle::Normal,
+                ligatures: false,
                 color: style.color,
             },
         );
@@ -106,6 +107,7 @@ impl<T> View<T> for Icon {
                 stretch: FontStretch::Normal,
                 weight: FontWeight::NORMAL,
                 style: FontStyle::Normal,
+                ligatures: false,
                 color: state.style.color,
             },
         );
