@@ -89,7 +89,7 @@ impl<T> View<T> for Icon {
 
         struct FontsLoaded;
         if !cx.contains_context::<FontsLoaded>() {
-            cx.fonts().load(include_font!("font"));
+            cx.fonts().load(include_font!("font"), Some("FA6"));
             cx.insert_context(FontsLoaded);
         }
 
