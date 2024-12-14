@@ -13,11 +13,11 @@ fn ui() -> impl View {
         if let Event::KeyPressed(e) = event {
             if e.is_key(Key::Escape) {
                 cx.cmd(AppCommand::Quit);
-                return false;
+                return true;
             }
         }
 
-        true
+        false
     })
 }
 
