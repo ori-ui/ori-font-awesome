@@ -25,8 +25,9 @@ impl IconFont {
     /// Get the font family for the icon font.
     pub fn family(self) -> FontFamily {
         let name = match self {
-            Self::Regular | Self::Solid => "FA6",
-            Self::Brand => "FA6",
+            Self::Regular => "FA6 Regular",
+            Self::Solid => "FA6 Solid",
+            Self::Brand => "FA6 Brands",
         };
 
         FontFamily::from(name)

@@ -89,7 +89,18 @@ impl<T> View<T> for Icon {
 
         struct FontsLoaded;
         if !cx.contains_context::<FontsLoaded>() {
-            cx.fonts().load(include_font!("font"), Some("FA6"));
+            cx.fonts().load(
+                include_font!("font/Font Awesome 6 Free-Regular-400.otf"),
+                Some("FA6 Regular"),
+            );
+            cx.fonts().load(
+                include_font!("font/Font Awesome 6 Free-Solid-900.otf"),
+                Some("FA6 Solid"),
+            );
+            cx.fonts().load(
+                include_font!("font/Font Awesome 6 Brands-Regular-400.otf"),
+                Some("FA6 Brands"),
+            );
             cx.insert_context(FontsLoaded);
         }
 

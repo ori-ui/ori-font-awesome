@@ -3,7 +3,7 @@ use ori_font_awesome as fa;
 
 fn ui() -> impl View {
     let buttons = hstack![
-        button(fa::icon("code")),
+        button(fa::icon("repeat")),
         button(fa::icon("bug")),
         button(fa::icon("font-awesome")),
     ]
