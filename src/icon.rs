@@ -40,8 +40,8 @@ impl Icon {
         Self {
             icon: icon.into(),
             solid: false,
-            size: IconStyle::SIZE.into(),
-            color: IconStyle::COLOR.into(),
+            size: Styled::style("size"),
+            color: Styled::style("color"),
         }
     }
 
