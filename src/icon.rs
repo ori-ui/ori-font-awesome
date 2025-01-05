@@ -40,8 +40,8 @@ impl Icon {
         Self {
             icon: icon.into(),
             solid: false,
-            size: Styled::style("size"),
-            color: Styled::style("color"),
+            size: Styled::style("icon.size"),
+            color: Styled::style("icon.color"),
         }
     }
 
@@ -71,6 +71,8 @@ impl<T> View<T> for Icon {
     type State = IconState;
 
     fn build(&mut self, cx: &mut BuildCx, _data: &mut T) -> Self::State {
+        cx.set_class("icon");
+
         let style = IconStyle::styled(self, cx.styles());
         let mut paragraph = Paragraph::new(1.0, TextAlign::Start, TextWrap::None);
 
