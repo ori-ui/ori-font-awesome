@@ -1,4 +1,4 @@
-use ori::{core::text::FontAttributes, prelude::*};
+use ori::prelude::*;
 
 use crate::{IconCode, IconFont};
 
@@ -11,7 +11,7 @@ pub fn icon(icon: impl Into<IconCode>) -> Icon {
 ///
 /// By default, the icon is rendered using the `icon.font` font family.
 /// This uses the [Font Awesome 6 Regular Free](https://fontawesome.com/) font by default.
-#[derive(Styled, Build, Rebuild)]
+#[derive(Stylable, Build, Rebuild)]
 pub struct Icon {
     /// The codepoint of the icon to display.
     #[rebuild(layout)]
@@ -25,12 +25,12 @@ pub struct Icon {
 
     /// The size of the icon.
     #[rebuild(layout)]
-    #[styled(default = 16.0)]
+    #[style(default = 16.0)]
     pub size: Styled<f32>,
 
     /// The color of the icon.
     #[rebuild(draw)]
-    #[styled(default -> Theme::CONTRAST or Color::BLACK)]
+    #[style(default -> Theme::CONTRAST or Color::BLACK)]
     pub color: Styled<Color>,
 }
 
@@ -73,7 +73,7 @@ impl<T> View<T> for Icon {
     fn build(&mut self, cx: &mut BuildCx, _data: &mut T) -> Self::State {
         cx.set_class("icon");
 
-        let style = IconStyle::styled(self, cx.styles());
+        let style = self.style(cx.styles());
         let mut paragraph = Paragraph::new(1.0, TextAlign::Start, TextWrap::None);
 
         paragraph.set_text(
