@@ -7,11 +7,32 @@ pub fn icon(icon: impl Into<IconCode>) -> Icon {
     Icon::new(icon)
 }
 
+/// The style of an [`Icon`].
+#[derive(Rebuild)]
+pub struct IconStyle {
+    /// The size of the icon.
+    #[rebuild(layout)]
+    pub size: f32,
+
+    /// The color of the icon.
+    #[rebuild(draw)]
+    pub color: Color,
+}
+
+impl Style for IconStyle {
+    fn builder() -> StyleBuilder<Self> {
+        StyleBuilder::new(|theme: &Theme| Self {
+            size: 16.0,
+            color: theme.contrast,
+        })
+    }
+}
+
 /// A view that displays a single icon.
 ///
 /// By default, the icon is rendered using the `icon.font` font family.
 /// This uses the [Font Awesome 6 Regular Free](https://fontawesome.com/) font by default.
-#[derive(Stylable, Build, Rebuild)]
+#[derive(Build, Rebuild)]
 pub struct Icon {
     /// The codepoint of the icon to display.
     #[rebuild(layout)]
@@ -24,14 +45,10 @@ pub struct Icon {
     pub solid: bool,
 
     /// The size of the icon.
-    #[rebuild(layout)]
-    #[style(default = 16.0)]
-    pub size: Styled<f32>,
+    pub size: Option<f32>,
 
     /// The color of the icon.
-    #[rebuild(draw)]
-    #[style(default -> Theme::CONTRAST or Color::BLACK)]
-    pub color: Styled<Color>,
+    pub color: Option<Color>,
 }
 
 impl Icon {
@@ -40,8 +57,8 @@ impl Icon {
         Self {
             icon: icon.into(),
             solid: false,
-            size: Styled::style("icon.size"),
-            color: Styled::style("icon.color"),
+            size: None,
+            color: None,
         }
     }
 
@@ -61,6 +78,17 @@ impl Icon {
     }
 }
 
+impl Stylable for Icon {
+    type Style = IconStyle;
+
+    fn style(&self, base: &Self::Style) -> Self::Style {
+        IconStyle {
+            size: self.size.unwrap_or(base.size),
+            color: self.color.unwrap_or(base.color),
+        }
+    }
+}
+
 #[doc(hidden)]
 pub struct IconState {
     style: IconStyle,
@@ -71,9 +99,7 @@ impl<T> View<T> for Icon {
     type State = IconState;
 
     fn build(&mut self, cx: &mut BuildCx, _data: &mut T) -> Self::State {
-        cx.set_class("icon");
-
-        let style = self.style(cx.styles());
+        let style = self.style(cx.style());
         let mut paragraph = Paragraph::new(1.0, TextAlign::Start, TextWrap::None);
 
         paragraph.set_text(
@@ -109,8 +135,9 @@ impl<T> View<T> for Icon {
         IconState { style, paragraph }
     }
 
-    fn rebuild(&mut self, state: &mut Self::State, cx: &mut RebuildCx, _data: &mut T, _old: &Self) {
-        state.style.rebuild(self, cx);
+    fn rebuild(&mut self, state: &mut Self::State, cx: &mut RebuildCx, _data: &mut T, old: &Self) {
+        Rebuild::rebuild(self, cx, old);
+        self.rebuild_style(cx, &mut state.style);
 
         state.paragraph.set_text(
             self.icon.as_str(),
