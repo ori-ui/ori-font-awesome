@@ -20,7 +20,7 @@ pub struct IconStyle {
 }
 
 impl Style for IconStyle {
-    fn builder() -> StyleBuilder<Self> {
+    fn default_style() -> StyleBuilder<Self> {
         StyleBuilder::new(|theme: &Theme| Self {
             size: 16.0,
             color: theme.contrast,
